@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="canvas2svg.min.js"></script>
+        <script>
+            var x = 10;
+            var y = 10;
+            var w = 400;
+            var h = 400;
+
+            var Ectx = new C2S(w,h);
+
+            window.onload = function(){
+
+                draw();
+
+                document.getElementById("countX").addEventListener("change", function(){
+                    x = this.value;
+                    draw();
+                });
+
+                document.getElementById("countY").addEventListener("change", function(){
+                    y = this.value;
+                    draw();
+                });
+
+                document.getElementById("canvasWidth").addEventListener("change", function(){
+                    w = this.value;
+                    document.getElementById("canvas").setAttribute("width",this.value);
+                    draw();
+                });
+
+                document.getElementById("canvasHeight").addEventListener("change", function(){
+                    h = this.value;
+                    document.getElementById("canvas").setAttribute("height",this.value);
+                    draw();
+                    
+                });
+            };
+
+            function draw(){
+
+                x= document.getElementById("countX").value;
+                y= document.getElementById("countY").value;
+                w= document.getElementById("canvasWidth").value;
+                h= document.getElementById("canvasHeight").value;
+                document.getElementById("canvas").setAttribute("width",w);
+                document.getElementById("canvas").setAttribute("height",h);
+
+                       
+                // Create a canvas
+                const canvas = document.getElementById("canvas");
+                const ctx = canvas.getContext("2d");
+                Ectx = new C2S(w,h);
+                
+                Ectx.clearRect(0, 0, w, h);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Define a new path
+                ctx.beginPath();
+                Ectx.beginPath();
+
+                // Set a start-point
+                ctx.moveTo(0,0);
+                Ectx.moveTo(0,0);
+
+                // Set an end-point
+                ctx.lineTo(w,0);
+                ctx.lineTo(w,h);
+                ctx.lineTo(0,h);
+                ctx.lineTo(0,0);
+
+                Ectx.lineTo(w,0);
+                Ectx.lineTo(w,h);
+                Ectx.lineTo(0,h);
+                Ectx.lineTo(0,0);
+
+                // Draw it
+                ctx.stroke();
+                
+                Ectx.stroke();
+
+               
+                //draw vertical lines lines
+                ctx.beginPath();
+                Ectx.beginPath();
+                var incrementX = w/x+1;
+                var incrementY = h/y+1;
+                var radius = incrementX<incrementY?incrementX/6:incrementY/6;
+                
+                for (let i = incrementX; i < w; i+=incrementX) {
+
+                    ctx.moveTo(i,0);
+                    Ectx.moveTo(i,0);
+                    //ctx.lineTo(i,incrementY/3);
+                    
+                    for (let j = 0; j < h; j+=incrementY) {
+                        let random = (Math.random()>=0.5)? 1 : 0;
+
+                        if(random)
+                        {
+                            ctx.arc(i+radius/2, incrementY/2+j, radius, -2.5, 2.5,0);
+                            Ectx.arc(i+radius/2, incrementY/2+j, radius, -2.5, 2.5,0);
+                        }else{
+                            ctx.arc(i-radius/2, incrementY/2+j, radius, -0.5, 0.5,1);
+                            Ectx.arc(i-radius/2, incrementY/2+j, radius, -0.5, 0.5,1);
+                        }
+
+                    }
+
+                    
+                    
+                    //ctx.lineTo(i,incrementY/3*2);
+                    
+
+                    ctx.lineTo(i,h);
+                    Ectx.lineTo(i,h);
+                }
+                ctx.stroke();
+                Ectx.stroke();
+
+
+                //draw horizontal lines lines
+                
+                ctx.beginPath();
+                Ectx.beginPath();
+                for (let i = incrementY; i < h; i+=incrementY) {
+                    ctx.moveTo(0,i);
+                    Ectx.moveTo(0,i);
+
+                    for (let j = 0; j < w; j+=incrementX) {
+                        let random = (Math.random()>=0.5)? 1 : 0;
+
+                        if(random)
+                        {
+                            ctx.arc(incrementX/2+j, i-radius/2, radius, 2, 1,0);
+                            Ectx.arc(incrementX/2+j, i-radius/2, radius, 2, 1,0);
+                        }else{
+                            ctx.arc(incrementX/2+j, i+radius/2, radius, -2, -1,1);
+                            Ectx.arc(incrementX/2+j, i+radius/2, radius, -2, -1,1);
+                        }
+                    }
+                    
+
+
+
+                    ctx.lineTo(w,i);
+                    Ectx.lineTo(w,i);
+                }
+                ctx.stroke();
+                Ectx.stroke();
+                
+
+            }
+
+            function downloadSvg(){
+                let svgData = Ectx.getSerializedSvg();
+                let blob = new Blob([svgData], { type: 'image/svg+xml' });
+                let a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'canvas.svg';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+            
+        </script>
+    </head>
+    <body>
+        <label>Width: <input id="canvasWidth" value="400"></label>
+        <br>
+        <label>Height: <input id="canvasHeight" value="400"></label>
+        <br>
+        <label>Number of puzzles x: <input id="countX" value="10"></label>
+        <br>
+        <label>Number of puzzles y: <input id="countY" value="10"></label>
+        <br>
+        <button onclick="draw()"">Draw</button><button onclick="downloadSvg()"">Download svg</button>
+        <hr>
+        
+        <canvas style="border:1px solid red;" width="400" height="400" id="canvas"></canvas>
+    </body>
+</html>
